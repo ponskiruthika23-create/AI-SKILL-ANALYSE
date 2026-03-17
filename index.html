@@ -1,162 +1,202 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI-Powered Skill Gap Analyzer</title>
+<title>AI Skill Gap Analyzer</title>
 
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #667eea, #764ba2);
-            text-align: center;
-            color: white;
-        }
-
-        .box {
-            background: white;
-            color: black;
-            width: 80%;
-            margin: 40px auto;
-            padding: 25px;
-            border-radius: 15px;
-        }
-
-        input, select, textarea {
-            width: 80%;
-            padding: 12px;
-            margin: 10px;
-            border-radius: 8px;
-        }
-
-        button {
-            padding: 12px 25px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .hidden { display:none; }
-
-        .score {
-            font-size: 30px;
-            font-weight: bold;
-        }
-    </style>
+<style>
+body{
+    font-family: Arial;
+    background: linear-gradient(to right,#667eea,#764ba2);
+    text-align:center;
+    color:white;
+}
+.box{
+    background:white;
+    color:black;
+    width:80%;
+    margin:40px auto;
+    padding:25px;
+    border-radius:15px;
+}
+input,select,textarea{
+    width:80%;
+    padding:10px;
+    margin:10px;
+}
+button{
+    padding:10px 20px;
+    background:#667eea;
+    color:white;
+    border:none;
+    border-radius:8px;
+}
+.hidden{display:none;}
+</style>
 </head>
 
 <body>
 
-<!-- 🟦 SLIDE 1 -->
-<div class="box" id="page1">
-    <h2>AI Skill Gap Analyzer 🚀</h2>
+<!-- 🟦 PAGE 1 -->
+<div class="box" id="p1">
+<h2>AI Skill Gap Analyzer 🚀</h2>
 
-    <input id="name" placeholder="Enter Your Name">
-    <input id="skills" placeholder="Enter Skills (battery, python)">
-    
-    <select id="field">
-        <option value="ev">EV Ecosystem</option>
-        <option value="auto">Automotive Manufacturing</option>
-    </select>
+<input id="name" placeholder="Enter Name">
+<input id="skills" placeholder="Enter Skills (battery, python)">
+<select id="field">
+<option value="ev">EV Ecosystem</option>
+<option value="auto">Automotive Manufacturing</option>
+</select>
 
-    <br>
-    <button onclick="startTest()">Start Test</button>
+<br>
+<button onclick="start()">Start Test</button>
 </div>
 
-<!-- 🟨 SLIDE 2 -->
-<div class="box hidden" id="page2">
-    <h2>Scenario Test 🧠</h2>
-
-    <p id="question"></p>
-
-    <h3>⏳ <span id="timer">30</span>s</h3>
-
-    <textarea id="answer" placeholder="Type answer..."></textarea>
-
-    <br>
-    <button onclick="submitTest()">Submit</button>
+<!-- 🟨 PAGE 2 -->
+<div class="box hidden" id="p2">
+<h2>Scenario Test 🧠</h2>
+<p id="q"></p>
+<h3>⏳ <span id="t">30</span>s</h3>
+<textarea id="ans"></textarea>
+<br>
+<button onclick="submitTest()">Submit</button>
 </div>
 
-<!-- 🟥 SLIDE 3 -->
-<div class="box hidden" id="page3">
-    <h2>Final Result 📊</h2>
+<!-- 🟥 PAGE 3 -->
+<div class="box hidden" id="p3">
+<h2>Final Score 📊</h2>
+<h3 id="score"></h3>
+<p id="msg"></p>
 
-    <div class="score" id="score"></div>
-    <p id="status"></p>
+<button onclick="nextPage()">View Recommendations ➡</button>
+</div>
+
+<!-- 🟩 PAGE 4 -->
+<div class="box hidden" id="p4">
+<h2>Recommendations 🎯</h2>
+
+<h4>Missing Skills</h4>
+<p id="missing"></p>
+
+<h4>Recommended Skills</h4>
+<p id="rec"></p>
+
+<h4>Learning Links</h4>
+<p id="links"></p>
+
+<h4>Career Roles</h4>
+<p id="roles"></p>
+
+<h4>Companies</h4>
+<p id="companies"></p>
 </div>
 
 <script>
 
-let time = 30, timer, cheat = 0, base = 0, field="";
+let time=30, timer, cheat=0;
+let field="", missing=[] , finalScore=0;
 
-// 🚫 Anti-cheat
-document.addEventListener("copy", e => e.preventDefault());
-document.addEventListener("paste", e => e.preventDefault());
-document.addEventListener("contextmenu", e => e.preventDefault());
+// Anti cheat
+document.addEventListener("copy",e=>e.preventDefault());
+document.addEventListener("paste",e=>e.preventDefault());
+document.addEventListener("contextmenu",e=>e.preventDefault());
 
-document.addEventListener("visibilitychange", () => {
-    if(document.hidden){
-        cheat++;
-        alert("⚠ Tab switch detected!");
-    }
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden){
+   cheat++;
+   alert("⚠ Tab switch detected!");
+ }
 });
 
-// ▶ Start Test
-function startTest(){
+// START
+function start(){
 
-    let skills = document.getElementById("skills").value.toLowerCase().split(",");
-    field = document.getElementById("field").value;
+ let skills=document.getElementById("skills").value.toLowerCase().split(",");
+ field=document.getElementById("field").value;
 
-    let req = field==="ev"
-        ? ["battery","bms","electronics","ev design","python"]
-        : ["cad","manufacturing","mechanics","design","automation"];
+ let req = field=="ev"
+ ? ["battery","bms","electronics","ev design","python"]
+ : ["cad","manufacturing","mechanics","design","automation"];
 
-    let miss = req.filter(s=>!skills.includes(s));
-    base = Math.max(0,50 - miss.length*10);
+ missing = req.filter(s=>!skills.includes(s));
 
-    // Question
-    document.getElementById("question").innerText =
-        field==="ev"
-        ? "How will you improve EV battery efficiency?"
-        : "How will you improve manufacturing efficiency?";
+ document.getElementById("q").innerText =
+ field=="ev"
+ ? "How will you improve EV battery efficiency?"
+ : "How will you improve manufacturing efficiency?";
 
-    document.getElementById("page1").classList.add("hidden");
-    document.getElementById("page2").classList.remove("hidden");
+ document.getElementById("p1").classList.add("hidden");
+ document.getElementById("p2").classList.remove("hidden");
 
-    timer = setInterval(()=>{
-        time--;
-        document.getElementById("timer").innerText = time;
-
-        if(time<=0) submitTest();
-    },1000);
+ timer=setInterval(()=>{
+   time--;
+   document.getElementById("t").innerText=time;
+   if(time<=0) submitTest();
+ },1000);
 }
 
-// ▶ Submit
+// SUBMIT
 function submitTest(){
 
-    clearInterval(timer);
+ clearInterval(timer);
 
-    let ans = document.getElementById("answer").value;
+ let ans=document.getElementById("ans").value;
+ let sc = ans.length>50 ? 50 : ans.length>20 ? 30 : 10;
 
-    let sc = ans.length>50 ? 50 : ans.length>20 ? 30 : 10;
+ sc -= cheat*5;
 
-    sc -= cheat*5;
+ let base = Math.max(0,50 - missing.length*10);
 
-    let final = Math.max(0, base + sc);
+ finalScore = Math.max(0, base + sc);
 
-    document.getElementById("page2").classList.add("hidden");
-    document.getElementById("page3").classList.remove("hidden");
+ document.getElementById("p2").classList.add("hidden");
+ document.getElementById("p3").classList.remove("hidden");
 
-    document.getElementById("score").innerText = final + "%";
+ document.getElementById("score").innerText = finalScore+"%";
 
-    let msg = final>=80
-        ? "🔥 You are READY for Industry!"
-        : final>=50
-        ? "⚡ You need some improvement in core skills."
-        : "❌ You need strong basics.";
+ let m = finalScore>=80
+ ? "🔥 READY for Industry"
+ : finalScore>=50
+ ? "⚡ Improve some skills"
+ : "❌ Not ready";
 
-    document.getElementById("status").innerText =
-        msg + " | Score based on real-time performance.";
+ document.getElementById("msg").innerText = m;
+}
+
+// NEXT PAGE
+function nextPage(){
+
+ document.getElementById("p3").classList.add("hidden");
+ document.getElementById("p4").classList.remove("hidden");
+
+ // Recommended skills
+ let recSkills = finalScore>=80
+ ? ["Advanced Skills","AI","Automation"]
+ : finalScore>=50
+ ? ["Intermediate Skills","Core Concepts"]
+ : ["Basics","Fundamentals"];
+
+ // Links
+ let links = field=="ev"
+ ? ["EV Basics","Battery Tech","BMS"]
+ : ["CAD","Manufacturing","Design"];
+
+ // Roles
+ let roles = field=="ev"
+ ? ["EV Engineer","Battery Engineer"]
+ : ["Design Engineer","Production Engineer"];
+
+ // Companies
+ let companies = finalScore>=80
+ ? (field=="ev" ? ["Tesla","Ather","Ola"] : ["Tata","Mahindra"])
+ : finalScore>=50
+ ? ["Mid-level Companies"]
+ : ["Internships"];
+
+ document.getElementById("missing").innerText = missing.join(", ");
+ document.getElementById("rec").innerText = recSkills.join(", ");
+ document.getElementById("links").innerText = links.join(", ");
+ document.getElementById("roles").innerText = roles.join(", ");
+ document.getElementById("companies").innerText = companies.join(", ");
 }
 
 </script>
