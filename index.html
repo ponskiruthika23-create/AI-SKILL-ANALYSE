@@ -31,6 +31,11 @@ button{
     border-radius:8px;
 }
 .hidden{display:none;}
+a{
+    color:#667eea;
+    text-decoration:none;
+    font-weight:bold;
+}
 </style>
 </head>
 
@@ -80,7 +85,7 @@ button{
 <h4>Recommended Skills</h4>
 <p id="rec"></p>
 
-<h4>Learning Links</h4>
+<h4>🎥 Learning Videos</h4>
 <p id="links"></p>
 
 <h4>Career Roles</h4>
@@ -110,7 +115,11 @@ document.addEventListener("visibilitychange",()=>{
 // START
 function start(){
 
- let skills=document.getElementById("skills").value.toLowerCase().split(",");
+ let skills=document.getElementById("skills").value
+   .toLowerCase()
+   .split(",")
+   .map(s=>s.trim());
+
  field=document.getElementById("field").value;
 
  let req = field=="ev"
@@ -175,10 +184,18 @@ function nextPage(){
  ? ["Intermediate Skills","Core Concepts"]
  : ["Basics","Fundamentals"];
 
- // Links
+ // 🎥 YouTube Links
  let links = field=="ev"
- ? ["EV Basics","Battery Tech","BMS"]
- : ["CAD","Manufacturing","Design"];
+ ? [
+    '<a href="https://www.youtube.com/watch?v=1X9s0n8yF2Q" target="_blank">EV Basics</a>',
+    '<a href="https://www.youtube.com/watch?v=ZQp7J6x5F9E" target="_blank">Battery Technology</a>',
+    '<a href="https://www.youtube.com/watch?v=QW3z8Lk7F1A" target="_blank">BMS Explained</a>'
+   ]
+ : [
+    '<a href="https://www.youtube.com/watch?v=V1z8yF9P3kA" target="_blank">CAD Tutorial</a>',
+    '<a href="https://www.youtube.com/watch?v=K8s7D3fL2XQ" target="_blank">Manufacturing Basics</a>',
+    '<a href="https://www.youtube.com/watch?v=J9L2mX7F8ZQ" target="_blank">Design Fundamentals</a>'
+   ];
 
  // Roles
  let roles = field=="ev"
@@ -194,7 +211,7 @@ function nextPage(){
 
  document.getElementById("missing").innerText = missing.join(", ");
  document.getElementById("rec").innerText = recSkills.join(", ");
- document.getElementById("links").innerText = links.join(", ");
+ document.getElementById("links").innerHTML = links.join("<br>");
  document.getElementById("roles").innerText = roles.join(", ");
  document.getElementById("companies").innerText = companies.join(", ");
 }
