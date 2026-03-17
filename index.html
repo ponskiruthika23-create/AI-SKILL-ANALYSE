@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Skill Gap Analyzer</title>
+    <style>
+        body { font-family: Arial; background:#f4f4f4; text-align:center; }
+        .box { background:white; padding:20px; margin:20px auto; width:80%; border-radius:10px; }
+        button { padding:10px 20px; margin:10px; cursor:pointer; }
+        input, select { padding:10px; width:80%; margin:10px; }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>AI Skill Gap Analyzer 🚀</h2>
+
+    <!-- STEP 1 -->
+    <input type="text" id="name" placeholder="Enter Your Name">
+
+    <!-- STEP 2 -->
+    <input type="text" id="skills" placeholder="Enter Your Skills (comma separated)">
+
+    <!-- STEP 3 -->
+    <select id="field">
+        <option value="ev">EV Ecosystem</option>
+        <option value="auto">Automotive Manufacturing</option>
+    </select>
+
+    <br>
+    <button onclick="analyze()">Analyze Skill Gap</button>
+
+    <div id="output"></div>
+</div>
+
+<script>
+
+let tabSwitch = 0;
+
+// Detect tab switch (anti-cheat basic)
+document.addEventListener("visibilitychange", () => {
+    if(document.hidden){
+        tabSwitch++;
+    }
+});
+
+function analyze(){
+
+    let name = document.getElementById("name").value;
+    let skills = document.getElementById("skills").value.toLowerCase().split(",");
+    let field = document.getElementById("field").value;
+
+    let required = field === "ev"
+        ? ["battery","bms","electronics","ev design","python"]
+        : ["cad","manufacturing","mechanics","design","automation"];
+
+    // Missing Skills
+    let missing = required.filter(skill => !skills.includes(skill));
+
+    // Base Score
+    let baseScore = Math.max(0, 100 - (missing.length * 20));
+
+    // Scenario Test Score (Random simulation)
+    let scenarioScore = Math.floor(Math.random() * 30);
+
+    let finalScore = Math.min(100, baseScore + scenarioScore);
+
+    // Penalty for cheating
+    if(tabSwitch > 2){
+        finalScore -= 20;
+    }
+
+    // Result Message
+    let resultMsg = "";
+    if(finalScore >= 80){
+        resultMsg = "🔥 You are READY to work in industry!";
+    }
+    else if(finalScore >= 50){
+        resultMsg = "⚡ You are improving, but need more skills.";
+    }
+    else{
+        resultMsg = "❌ Not ready. Focus on basics.";
+    }
+
+    // Recommended Skills
+    let recommendedSkills = [];
+
+    if(finalScore >= 80){
+        recommendedSkills = field === "ev"
+            ? ["Advanced BMS","EV System Design","AI in EV"]
+            : ["Advanced CAD","Automation","Optimization"];
+    }
+    else if(finalScore >= 50){
+        recommendedSkills = field === "ev"
+            ? ["Basic BMS","Battery Fundamentals","EV Basics"]
+            : ["CAD Basics","Design Fundamentals","Manufacturing Basics"];
+    }
+    else{
+        recommendedSkills = field === "ev"
+            ? ["Electrical Basics","Intro to EV","Basic Programming"]
+            : ["Mechanical Basics","Engineering Fundamentals","Basic CAD"];
+    }
+
+    // Learning Links
+    let links = field === "ev"
+        ? [
+            "https://youtu.be/EV1",
+            "https://youtu.be/EV2",
+            "https://youtu.be/EV3"
+        ]
+        : [
+            "https://youtu.be/AUTO1",
+            "https://youtu.be/AUTO2",
+            "https://youtu.be/AUTO3"
+        ];
+
+    // Company Suggestion
+    let companies = [];
+
+    if(finalScore >= 80){
+        companies = field === "ev"
+            ? ["Tesla","Ather","Ola Electric"]
+            : ["Tata Motors","Ashok Leyland","Mahindra"];
+    }
+    else if(finalScore >= 50){
+        companies = field === "ev"
+            ? ["EV Startups","Battery Companies"]
+            : ["Mid-level Manufacturing Companies"];
+    }
+    else{
+        companies = ["Internships Recommended"];
+    }
+
+    // Output
+    document.getElementById("output").innerHTML = `
+        <h3>Hello ${name}</h3>
+        <h2>Score: ${finalScore}%</h2>
+        <p>${resultMsg}</p>
+
+        <h4>Missing Skills</h4>
+        <p>${missing.join(", ")}</p>
+
+        <h4>Recommended Skills</h4>
+        <p>${recommendedSkills.join(", ")}</p>
+
+        <h4>Learning Resources</h4>
+        <p>${links.join("<br>")}</p>
+
+        <h4>Career Roles</h4>
+        <p>${field === "ev" ? "EV Engineer, Battery Engineer" : "Design Engineer, Manufacturing Engineer"}</p>
+
+        <h4>Recommended Companies</h4>
+        <p>${companies.join(", ")}</p>
+
+        <p>⚠ Tab Switch Count: ${tabSwitch}</p>
+    `;
+}
+
+</script>
+
+</body>
+</html>
