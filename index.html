@@ -41,7 +41,6 @@ a{
 
 <body>
 
-<!-- 🟦 PAGE 1 -->
 <div class="box" id="p1">
 <h2>AI Skill Gap Analyzer 🚀</h2>
 
@@ -56,7 +55,6 @@ a{
 <button onclick="start()">Start Test</button>
 </div>
 
-<!-- 🟨 PAGE 2 -->
 <div class="box hidden" id="p2">
 <h2>Scenario Test 🧠</h2>
 <p id="q"></p>
@@ -66,7 +64,6 @@ a{
 <button onclick="submitTest()">Submit</button>
 </div>
 
-<!-- 🟥 PAGE 3 -->
 <div class="box hidden" id="p3">
 <h2>Final Score 📊</h2>
 <h3 id="score"></h3>
@@ -75,7 +72,6 @@ a{
 <button onclick="nextPage()">View Recommendations ➡</button>
 </div>
 
-<!-- 🟩 PAGE 4 -->
 <div class="box hidden" id="p4">
 <h2>Recommendations 🎯</h2>
 
@@ -99,11 +95,6 @@ a{
 
 let time=30, timer, cheat=0;
 let field="", missing=[] , finalScore=0;
-
-// Anti cheat
-document.addEventListener("copy",e=>e.preventDefault());
-document.addEventListener("paste",e=>e.preventDefault());
-document.addEventListener("contextmenu",e=>e.preventDefault());
 
 document.addEventListener("visibilitychange",()=>{
  if(document.hidden){
@@ -143,32 +134,45 @@ function start(){
  },1000);
 }
 
-// SUBMIT
+// SUBMIT (AI call)
 function submitTest(){
 
  clearInterval(timer);
 
  let ans=document.getElementById("ans").value;
- let sc = ans.length>50 ? 50 : ans.length>20 ? 30 : 10;
 
- sc -= cheat*5;
+ fetch("http://127.0.0.1:5000/analyze", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ answer: ans })
+})
+.then(res => res.json())
+.then(data => {
 
- let base = Math.max(0,50 - missing.length*10);
+    let sc = data.ai_score;
 
- finalScore = Math.max(0, base + sc);
+    sc -= cheat*5;
 
- document.getElementById("p2").classList.add("hidden");
- document.getElementById("p3").classList.remove("hidden");
+    let base = Math.max(0,50 - missing.length*10);
 
- document.getElementById("score").innerText = finalScore+"%";
+    finalScore = Math.max(0, base + sc);
 
- let m = finalScore>=80
- ? "🔥 READY for Industry"
- : finalScore>=50
- ? "⚡ Improve some skills"
- : "❌ Not ready";
+    document.getElementById("p2").classList.add("hidden");
+    document.getElementById("p3").classList.remove("hidden");
 
- document.getElementById("msg").innerText = m;
+    document.getElementById("score").innerText = finalScore+"%";
+
+    let m = finalScore>=80
+    ? "🔥 READY for Industry"
+    : finalScore>=50
+    ? "⚡ Improve some skills"
+    : "❌ Not ready";
+
+    document.getElementById("msg").innerText = m;
+
+});
 }
 
 // NEXT PAGE
@@ -177,14 +181,12 @@ function nextPage(){
  document.getElementById("p3").classList.add("hidden");
  document.getElementById("p4").classList.remove("hidden");
 
- // Recommended skills
  let recSkills = finalScore>=80
  ? ["Advanced Skills","AI","Automation"]
  : finalScore>=50
  ? ["Intermediate Skills","Core Concepts"]
  : ["Basics","Fundamentals"];
 
- // 🎥 YouTube Links
  let links = field=="ev"
  ? [
     '<a href="https://www.youtube.com/watch?v=1X9s0n8yF2Q" target="_blank">EV Basics</a>',
@@ -197,12 +199,10 @@ function nextPage(){
     '<a href="https://www.youtube.com/watch?v=J9L2mX7F8ZQ" target="_blank">Design Fundamentals</a>'
    ];
 
- // Roles
  let roles = field=="ev"
  ? ["EV Engineer","Battery Engineer"]
  : ["Design Engineer","Production Engineer"];
 
- // Companies
  let companies = finalScore>=80
  ? (field=="ev" ? ["Tesla","Ather","Ola"] : ["Tata","Mahindra"])
  : finalScore>=50
